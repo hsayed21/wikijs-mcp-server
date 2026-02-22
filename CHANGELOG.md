@@ -15,8 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Add graceful shutdown handlers for MCP server
-
-
 ---
 
 ## [3.0.0] - 2025-12-15
@@ -29,8 +27,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Track package-lock.json for reproducible builds
-
-
 ---
 
 ## [1.0.0] - 2025-11-05
@@ -59,24 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Correct GraphQL tags field structure
 - Load .env from deployment directory
 
-### Added
-- Nothing yet
-
-### Changed
-- Nothing yet
-
-### Deprecated
-- Nothing yet
-
-### Removed
-- Nothing yet
-
-### Fixed
-- Nothing yet
-
 ### Security
-- Nothing yet
-
 ---
 
 [Unreleased]: https://github.com/markus-michalski/wikijs-mcp-server/compare/v3.0.1...HEAD
