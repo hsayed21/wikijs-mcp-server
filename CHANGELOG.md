@@ -9,7 +9,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
----
+### Added
+- Nothing yet
+
+### Changed
+- Nothing yet
+
+### Deprecated
+- Nothing yet
+
+### Removed
+- Nothing yet
+
+### Fixed
+- Nothing yet
+
+### Security
+- Nothing yet
+
+## [2.0.1] - 2026-03-20
+
+### Added
+- Auto-fetch content on metadata-only updates (#3)
+
+### Changed
+- clean up CHANGELOG.md placeholder entries
+
+### Fixed
+- auto-fetch title and description on partial page updates (#5)
+- Security hardening from audit (#4)
 
 ## [3.0.1] - 2025-12-15
 
@@ -58,4 +86,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 ---
 
-[Unreleased]: https://github.com/markus-michalski/wikijs-mcp-server/compare/v3.0.1...HEAD
+[Unreleased]: https://github.com/markus-michalski/wikijs-mcp-server/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/markus-michalski/wikijs-mcp-server/releases/tag/v2.0.1
