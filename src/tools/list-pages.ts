@@ -14,22 +14,25 @@ export const listPagesToolDefinition = {
   name: 'wikijs_list_pages',
   description: `List all pages in Wiki.js with optional filtering and pagination.
 
-This tool returns a paginated list of all pages. Use the offset parameter to navigate through large result sets.
+This tool returns a paginated list of published pages. Use the offset parameter to navigate through large result sets.
 
 Args:
   - locale (string, optional): Filter by locale (e.g., "en", "de")
-  - limit (number): Max pages to return, default 50, max 200
+  - path (string, optional): Only include pages under this path
+  - limit (number): Max pages to return, default 50, max 200. Use -1 to return all matching pages.
   - offset (number): Skip N pages for pagination, default 0
 
 Returns:
-  - pages: Array of page summaries (id, path, title, description, locale, tags, updatedAt)
+  - pages: Array of published page summaries (id, path, title, description, locale, tags, updatedAt)
   - pagination: { limit, offset, total_count, has_more, next_offset }
 
 Use pagination.has_more and pagination.next_offset to fetch more results.
 
 Examples:
   - List all: (no params, returns first 50)
+  - List all matching pages: limit=-1
   - Filter by locale: locale="de"
+  - Filter by path: path="osticket/"
   - Paginate: offset=50, limit=50 (get pages 51-100)`,
   inputSchema: listPagesSchema,
   annotations: {
@@ -49,9 +52,14 @@ export async function handleListPages(
     const validated: ListPagesInput = listPagesSchema.parse(args);
 
     const limit = validated.limit ?? DEFAULT_PAGE_LIMIT;
-    const offset = validated.offset ?? 0;
+    const offset = limit < 0 ? 0 : validated.offset ?? 0;
 
-    const { pages, total } = await client.listPages(validated.locale ?? null, limit, offset);
+    const { pages, total } = await client.listPages(
+      validated.locale ?? null,
+      limit,
+      offset,
+      validated.path ?? null
+    );
 
     const pageList = pages.map((p) => ({
       id: p.id,

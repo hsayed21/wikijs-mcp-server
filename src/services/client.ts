@@ -9,9 +9,7 @@ import type {
   WikiPage,
   WikiPageListItem,
   SearchResponse,
-  CreatePageParams,
-  UpdatePageParams,
-  ApiResponseResult,
+  WikiPageTreeNode,
 } from '../types.js';
 
 interface GraphQLResponse<T> {
@@ -77,7 +75,12 @@ export class WikiJsClient {
   /**
    * List all pages with optional filtering
    */
-  async listPages(locale: string | null = null, limit: number = 100, offset: number = 0): Promise<{ pages: WikiPageListItem[]; total: number }> {
+  async listPages(
+    locale: string | null = null,
+    limit: number = 100,
+    offset: number = 0,
+    path: string | null = null
+  ): Promise<{ pages: WikiPageListItem[]; total: number }> {
     const query = `
       query {
         pages {
@@ -99,15 +102,23 @@ export class WikiJsClient {
 
     const data = await this.query<{ pages: { list: WikiPageListItem[] } }>(query);
     let pages = data.pages.list;
-    const total = pages.length;
 
     // Filter by locale if provided
     if (locale) {
       pages = pages.filter((p) => p.locale === locale);
     }
 
-    // Apply pagination
-    const paginatedPages = pages.slice(offset, offset + limit);
+    // Keep support-facing retrieval scoped to published pages.
+    pages = pages.filter((p) => p.isPublished);
+
+    // Filter to pages under the requested path if provided.
+    if (path) {
+      pages = pages.filter((p) => p.path.startsWith(path));
+    }
+
+    const total = pages.length;
+
+    const paginatedPages = limit < 0 ? pages : pages.slice(offset, offset + limit);
 
     return { pages: paginatedPages, total };
   }
@@ -187,7 +198,11 @@ export class WikiJsClient {
   /**
    * Search pages
    */
-  async searchPages(searchQuery: string, locale: string | null = null): Promise<SearchResponse> {
+  async searchPages(
+    searchQuery: string,
+    locale: string | null = null,
+    path: string | null = null
+  ): Promise<SearchResponse> {
     const query = `
       query($query: String!) {
         pages {
@@ -209,209 +224,61 @@ export class WikiJsClient {
     const data = await this.query<{ pages: { search: SearchResponse } }>(query, { query: searchQuery });
     const results = data.pages.search;
 
-    // Filter by locale if provided
-    if (locale && results.results) {
-      results.results = results.results.filter((r) => r.locale === locale);
-      results.totalHits = results.results.length;
-    }
+    const { pages: activePages } = await this.listPages(locale, -1, 0, path);
+    const activePageKeys = new Set(activePages.map((p) => `${p.locale}:${p.path}`));
+    results.results = results.results.filter((r) => activePageKeys.has(`${r.locale}:${r.path}`));
+    results.totalHits = results.results.length;
 
     return results;
   }
 
   /**
-   * Create a new page
+   * Get the hierarchical Wiki.js page tree
    */
-  async createPage(params: CreatePageParams): Promise<WikiPage> {
+  async getPageTree(
+    path: string | null = null,
+    parent: number | null = null,
+    mode: 'ALL' | 'FOLDERS' | 'PAGES' = 'ALL',
+    locale: string = 'en',
+    includeAncestors: boolean = false
+  ): Promise<WikiPageTreeNode[]> {
     const query = `
-      mutation(
-        $content: String!
-        $description: String!
-        $editor: String!
-        $isPublished: Boolean!
-        $isPrivate: Boolean!
-        $locale: String!
-        $path: String!
-        $tags: [String]!
-        $title: String!
-      ) {
+      query($path: String, $parent: Int, $mode: PageTreeMode!, $locale: String!, $includeAncestors: Boolean) {
         pages {
-          create(
-            content: $content
-            description: $description
-            editor: $editor
-            isPublished: $isPublished
-            isPrivate: $isPrivate
-            locale: $locale
-            path: $path
-            tags: $tags
-            title: $title
-          ) {
-            responseResult {
-              succeeded
-              errorCode
-              slug
-              message
-            }
-            page {
-              id
-              path
-              title
-            }
+          tree(path: $path, parent: $parent, mode: $mode, locale: $locale, includeAncestors: $includeAncestors) {
+            id
+            path
+            depth
+            title
+            isPrivate
+            isFolder
+            privateNS
+            parent
+            pageId
+            locale
           }
         }
       }
     `;
 
-    const data = await this.query<{
-      pages: {
-        create: {
-          responseResult: ApiResponseResult;
-          page: WikiPage;
-        };
-      };
-    }>(query, params as unknown as Record<string, unknown>);
+    const data = await this.query<{ pages: { tree: WikiPageTreeNode[] } }>(query, {
+      path,
+      parent,
+      mode,
+      locale,
+      includeAncestors,
+    });
 
-    if (!data.pages.create.responseResult.succeeded) {
-      throw new Error(`Failed to create page: ${data.pages.create.responseResult.message}`);
-    }
+    const { pages: activePages } = await this.listPages(locale, -1, 0, path ?? null);
+    const activePagePaths = new Set(activePages.map((page) => page.path));
 
-    return data.pages.create.page;
-  }
-
-  /**
-   * Update an existing page
-   *
-   * Uses a static parameterized mutation with all optional fields.
-   * Wiki.js ignores null values for optional parameters.
-   */
-  async updatePage(params: UpdatePageParams): Promise<ApiResponseResult> {
-    const query = `
-      mutation(
-        $id: Int!
-        $content: String
-        $title: String
-        $description: String
-        $isPublished: Boolean
-        $tags: [String]
-      ) {
-        pages {
-          update(
-            id: $id
-            content: $content
-            title: $title
-            description: $description
-            isPublished: $isPublished
-            tags: $tags
-          ) {
-            responseResult {
-              succeeded
-              errorCode
-              message
-            }
-          }
-        }
+    return data.pages.tree.filter((node) => {
+      if (!node.isFolder) {
+        return activePagePaths.has(node.path);
       }
-    `;
 
-    const variables: Record<string, unknown> = {
-      id: params.id,
-      content: params.content ?? null,
-      title: params.title ?? null,
-      description: params.description ?? null,
-      isPublished: params.isPublished ?? null,
-      tags: params.tags ?? null,
-    };
-
-    const data = await this.query<{
-      pages: {
-        update: {
-          responseResult: ApiResponseResult;
-        };
-      };
-    }>(query, variables);
-
-    if (!data.pages.update.responseResult.succeeded) {
-      throw new Error(`Failed to update page: ${data.pages.update.responseResult.message}`);
-    }
-
-    return data.pages.update.responseResult;
+      return activePages.some((page) => page.path === node.path || page.path.startsWith(`${node.path}/`));
+    });
   }
 
-  /**
-   * Delete a page
-   */
-  async deletePage(id: number): Promise<ApiResponseResult> {
-    const query = `
-      mutation($id: Int!) {
-        pages {
-          delete(id: $id) {
-            responseResult {
-              succeeded
-              errorCode
-              message
-            }
-          }
-        }
-      }
-    `;
-
-    const data = await this.query<{
-      pages: {
-        delete: {
-          responseResult: ApiResponseResult;
-        };
-      };
-    }>(query, { id });
-
-    if (!data.pages.delete.responseResult.succeeded) {
-      throw new Error(`Failed to delete page: ${data.pages.delete.responseResult.message}`);
-    }
-
-    return data.pages.delete.responseResult;
-  }
-
-  /**
-   * Move a page to a new path
-   */
-  async movePage(id: number, destinationPath: string, destinationLocale: string = 'en'): Promise<ApiResponseResult> {
-    const query = `
-      mutation($id: Int!, $destinationPath: String!, $destinationLocale: String!) {
-        pages {
-          move(
-            id: $id
-            destinationPath: $destinationPath
-            destinationLocale: $destinationLocale
-          ) {
-            responseResult {
-              succeeded
-              errorCode
-              message
-            }
-          }
-        }
-      }
-    `;
-
-    const data = await this.query<{
-      pages: {
-        move: {
-          responseResult: ApiResponseResult;
-        };
-      };
-    }>(query, { id, destinationPath, destinationLocale });
-
-    if (!data.pages.move.responseResult.succeeded) {
-      throw new Error(`Failed to move page: ${data.pages.move.responseResult.message}`);
-    }
-
-    return data.pages.move.responseResult;
-  }
-
-  /**
-   * Get all pages (for fetching tags when updating)
-   */
-  async getAllPages(): Promise<WikiPageListItem[]> {
-    const { pages } = await this.listPages(null, 10000, 0);
-    return pages;
-  }
 }

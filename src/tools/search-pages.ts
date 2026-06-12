@@ -13,20 +13,22 @@ export const searchPagesToolDefinition = {
   name: 'wikijs_search_pages',
   description: `Search for pages in Wiki.js by query string.
 
-This tool performs a full-text search across all page content and metadata. Results are ranked by relevance.
+This tool performs a full-text search across published page content and metadata. Results are ranked by relevance.
 
 Args:
   - query (string, required): Search query (min 2 chars, max 200 chars)
   - locale (string, optional): Filter results by locale
+  - path (string, optional): Only include pages under this path
 
 Returns:
-  - totalHits: Total number of matching pages
+  - totalHits: Total number of matching published pages
   - suggestions: Search suggestions for refinement
   - results: Array of matching pages (id, title, path, description, locale)
 
 Examples:
   - Search for topic: query="osTicket API"
-  - Search in German pages: query="Plugin", locale="de"`,
+  - Search in German pages: query="Plugin", locale="de"
+  - Search inside a section: query="API", path="osticket/"`,
   inputSchema: searchPagesSchema,
   annotations: {
     readOnlyHint: true,
@@ -44,7 +46,11 @@ export async function handleSearchPages(
     // Validate input with Zod
     const validated: SearchPagesInput = searchPagesSchema.parse(args);
 
-    const results = await client.searchPages(validated.query, validated.locale ?? null);
+    const results = await client.searchPages(
+      validated.query,
+      validated.locale ?? null,
+      validated.path ?? null
+    );
 
     return {
       content: [

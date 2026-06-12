@@ -1,6 +1,6 @@
 # Wiki.js MCP Server
 
-**Model Context Protocol Server for Wiki.js integration in Claude Code** - Create and manage wiki pages directly from your AI assistant.
+**Model Context Protocol Server for Wiki.js integration in Claude Code** - Search and read Wiki.js knowledge base content directly from your AI assistant.
 
 ## v2.0.0 - Major Refactoring
 
@@ -55,13 +55,10 @@ cp .env.example .env
 
 | Tool | Description | Annotations |
 |------|-------------|-------------|
-| `wikijs_create_page` | Create new wiki pages with Markdown or HTML | `destructiveHint: false` |
-| `wikijs_update_page` | Update existing pages (content, title, tags) | `idempotentHint: true` |
 | `wikijs_get_page` | Retrieve full page content and metadata | `readOnlyHint: true` |
 | `wikijs_list_pages` | List pages with pagination and filtering | `readOnlyHint: true` |
+| `wikijs_get_tree` | Retrieve the hierarchical Wiki.js page tree | `readOnlyHint: true` |
 | `wikijs_search_pages` | Full-text search across wiki pages | `readOnlyHint: true` |
-| `wikijs_delete_page` | Permanently delete pages | `destructiveHint: true` |
-| `wikijs_move_page` | Move pages to new paths | `destructiveHint: false` |
 
 ## Development
 

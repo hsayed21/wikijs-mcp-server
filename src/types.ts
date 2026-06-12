@@ -44,32 +44,17 @@ export interface SearchResponse {
   totalHits: number;
 }
 
-export interface ApiResponseResult {
-  succeeded: boolean;
-  errorCode: number;
-  message: string;
-  slug?: string;
-}
-
-export interface CreatePageParams {
-  content: string;
-  description: string;
-  editor: 'markdown' | 'code' | 'ckeditor';
-  isPublished: boolean;
-  isPrivate: boolean;
-  locale: string;
-  path: string;
-  tags: string[];
-  title: string;
-}
-
-export interface UpdatePageParams {
+export interface WikiPageTreeNode {
   id: number;
-  content?: string | null;
-  title?: string | null;
-  description?: string | null;
-  isPublished?: boolean | null;
-  tags?: string[] | null;
+  path: string;
+  depth: number;
+  title: string;
+  isPrivate: boolean;
+  isFolder: boolean;
+  privateNS?: string;
+  parent?: number;
+  pageId?: number;
+  locale: string;
 }
 
 // Pagination Types

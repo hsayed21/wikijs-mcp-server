@@ -18,20 +18,14 @@ import { existsSync } from 'fs';
 
 import { WikiJsClient } from './services/client.js';
 import {
-  createPageToolDefinition,
-  handleCreatePage,
   getPageToolDefinition,
   handleGetPage,
+  getTreeToolDefinition,
+  handleGetTree,
   listPagesToolDefinition,
   handleListPages,
   searchPagesToolDefinition,
   handleSearchPages,
-  updatePageToolDefinition,
-  handleUpdatePage,
-  deletePageToolDefinition,
-  handleDeletePage,
-  movePageToolDefinition,
-  handleMovePage,
 } from './tools/index.js';
 
 // Load environment variables from deployment directory
@@ -64,13 +58,6 @@ const server = new McpServer({
 
 // Register tools using modern registerTool API
 server.tool(
-  createPageToolDefinition.name,
-  createPageToolDefinition.description,
-  createPageToolDefinition.inputSchema.shape,
-  async (args) => handleCreatePage(wikiClient, args)
-);
-
-server.tool(
   getPageToolDefinition.name,
   getPageToolDefinition.description,
   getPageToolDefinition.inputSchema.shape,
@@ -85,31 +72,17 @@ server.tool(
 );
 
 server.tool(
+  getTreeToolDefinition.name,
+  getTreeToolDefinition.description,
+  getTreeToolDefinition.inputSchema.shape,
+  async (args) => handleGetTree(wikiClient, args)
+);
+
+server.tool(
   searchPagesToolDefinition.name,
   searchPagesToolDefinition.description,
   searchPagesToolDefinition.inputSchema.shape,
   async (args) => handleSearchPages(wikiClient, args)
-);
-
-server.tool(
-  updatePageToolDefinition.name,
-  updatePageToolDefinition.description,
-  updatePageToolDefinition.inputSchema.shape,
-  async (args) => handleUpdatePage(wikiClient, args)
-);
-
-server.tool(
-  deletePageToolDefinition.name,
-  deletePageToolDefinition.description,
-  deletePageToolDefinition.inputSchema.shape,
-  async (args) => handleDeletePage(wikiClient, args)
-);
-
-server.tool(
-  movePageToolDefinition.name,
-  movePageToolDefinition.description,
-  movePageToolDefinition.inputSchema.shape,
-  async (args) => handleMovePage(wikiClient, args)
 );
 
 // Graceful shutdown handling
