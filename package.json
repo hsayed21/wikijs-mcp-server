@@ -1,11 +1,11 @@
 {
-  "name": "@markus-michalski/wikijs-mcp-server",
+  "name": "@hsayed21/wikijs-mcp",
   "version": "2.0.1",
-  "description": "MCP Server for Wiki.js GraphQL API integration",
+  "description": "Read-only MCP server for searching and retrieving published Wiki.js knowledge base pages",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "wikijs-mcp-server": "dist/index.js"
+    "wikijs-mcp": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -26,7 +26,7 @@
     "wiki",
     "model-context-protocol"
   ],
-  "author": "Markus Michalski",
+  "author": "hsayed21",
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.24.3",

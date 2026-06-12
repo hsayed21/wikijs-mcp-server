@@ -1,6 +1,6 @@
 # Wiki.js MCP Server
 
-**Model Context Protocol Server for Wiki.js integration in Claude Code** - Search and read Wiki.js knowledge base content directly from your AI assistant.
+**Read-only Model Context Protocol server for Wiki.js** - Search, list, browse, and retrieve published Wiki.js knowledge base pages from your AI assistant.
 
 ## v2.0.0 - Major Refactoring
 
@@ -14,42 +14,20 @@ This version includes a complete rewrite following MCP Best Practices:
 - **Pagination Support** - List operations return `has_more`, `next_offset`, `total_count`
 - **Character Limits** - Large content is truncated with clear notices
 
-## Documentation
-
-**[Complete Documentation & FAQ](https://faq.markus-michalski.net/en/mcp/wikijs)**
-
-The comprehensive guide includes:
-- Installation instructions
-- Configuration examples
-- All 7 MCP tools with parameters
-- GraphQL API integration details
-- Troubleshooting guide
-
 ## Quick Start
 
 ```bash
-# 1. Clone repository
-git clone https://github.com/markus-michalski/wikijs-mcp-server.git ~/.claude/mcp-servers/wikijs
+# 1. Install package
+npm install -g @hsayed21/wikijs-mcp
 
-# 2. Install dependencies
-cd ~/.claude/mcp-servers/wikijs
-npm install
-
-# 3. Build TypeScript
-npm run build
-
-# 4. Configure environment
-cp .env.example .env
-# Edit .env with your Wiki.js API credentials
-
-# 5. Add to Claude Code config and restart
+# 2. Configure your MCP client with WIKIJS_API_URL and WIKIJS_API_TOKEN
 ```
 
 ## Requirements
 
 - **Node.js 18+**
 - **Wiki.js instance** (v2.x or v3.x)
-- **Wiki.js API Token** with page management permissions
+- **Wiki.js API Token** with read permissions
 
 ## Available Tools
 
@@ -76,7 +54,7 @@ npm run typecheck
 ## Project Structure
 
 ```
-wikijs-mcp-server/
+wikijs-mcp/
 ├── src/
 │   ├── index.ts           # Main server entry point
 │   ├── constants.ts       # Shared constants (CHARACTER_LIMIT, etc.)
@@ -94,10 +72,13 @@ wikijs-mcp-server/
 MIT License - See [LICENSE](./LICENSE) for details
 
 ## Author
-
 **Markus Michalski**
 - Website: [markus-michalski.net](https://markus-michalski.net)
 - GitHub: [@markus-michalski](https://github.com/markus-michalski)
+
+## Attribution
+
+Originally authored by [@markus-michalski](https://github.com/markus-michalski). This package was updated by **hsayed21** to fit a read-only Wiki.js MCP workflow for AI support agents.
 
 ## Links
 
