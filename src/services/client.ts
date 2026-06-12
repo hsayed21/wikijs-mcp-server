@@ -17,6 +17,21 @@ interface GraphQLResponse<T> {
   errors?: Array<{ message: string }>;
 }
 
+type SortDirection = 'ASC' | 'DESC';
+
+function compareValues(left: string | number | undefined, right: string | number | undefined, direction: SortDirection): number {
+  const multiplier = direction === 'ASC' ? 1 : -1;
+
+  if (typeof left === 'number' && typeof right === 'number') {
+    return (left - right) * multiplier;
+  }
+
+  return String(left ?? '').localeCompare(String(right ?? ''), undefined, {
+    numeric: true,
+    sensitivity: 'base',
+  }) * multiplier;
+}
+
 export class WikiJsClient {
   private apiUrl: string;
   private apiToken: string;
@@ -115,6 +130,8 @@ export class WikiJsClient {
     if (path) {
       pages = pages.filter((p) => p.path.startsWith(path));
     }
+
+    pages = pages.sort((left, right) => compareValues(left.title, right.title, 'ASC'));
 
     const total = pages.length;
 
@@ -227,6 +244,7 @@ export class WikiJsClient {
     const { pages: activePages } = await this.listPages(locale, -1, 0, path);
     const activePageKeys = new Set(activePages.map((p) => `${p.locale}:${p.path}`));
     results.results = results.results.filter((r) => activePageKeys.has(`${r.locale}:${r.path}`));
+    results.results = results.results.sort((left, right) => compareValues(left.title, right.title, 'ASC'));
     results.totalHits = results.results.length;
 
     return results;
