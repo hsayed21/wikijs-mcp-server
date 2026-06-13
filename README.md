@@ -31,12 +31,12 @@ npm install -g @hsayed21/wikijs-mcp
 
 ## Available Tools
 
-| Tool | Description | Annotations |
-|------|-------------|-------------|
-| `wikijs_get_page` | Retrieve full page content and metadata | `readOnlyHint: true` |
-| `wikijs_list_pages` | List pages with pagination and filtering | `readOnlyHint: true` |
-| `wikijs_get_tree` | Retrieve the hierarchical Wiki.js page tree | `readOnlyHint: true` |
-| `wikijs_search_pages` | Full-text search across wiki pages | `readOnlyHint: true` |
+| Tool | Description | Parameters | Annotations |
+|------|-------------|------------|-------------|
+| `wikijs_get_page` | Retrieve full page content and metadata | `id?`, `path?`, `locale="en"` (provide `id` or `path`) | `readOnlyHint: true` |
+| `wikijs_list_pages` | List pages with pagination and filtering | `locale?`, `path?`, `limit=50`, `offset=0` | `readOnlyHint: true` |
+| `wikijs_get_tree` | Retrieve the hierarchical Wiki.js page tree | `parent_path?`, `parent_id?`, `mode="ALL"`, `locale="en"`, `includeAncestors=false` | `readOnlyHint: true` |
+| `wikijs_search_pages` | Full-text search across wiki pages | `query`, `locale?`, `path?` | `readOnlyHint: true` |
 
 ## Development
 
