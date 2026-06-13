@@ -33,10 +33,10 @@ npm install -g @hsayed21/wikijs-mcp
 
 | Tool | Description | Parameters | Annotations |
 |------|-------------|------------|-------------|
-| `wikijs_get_page` | Retrieve full page content and metadata | `id?`, `path?`, `locale="en"` (provide `id` or `path`) | `readOnlyHint: true` |
-| `wikijs_list_pages` | List pages with pagination and filtering | `locale?`, `path?`, `limit=50`, `offset=0` | `readOnlyHint: true` |
-| `wikijs_get_tree` | Retrieve the hierarchical Wiki.js page tree | `parent_path?`, `parent_id?`, `mode="ALL"`, `locale="en"`, `includeAncestors=false` | `readOnlyHint: true` |
-| `wikijs_search_pages` | Full-text search across wiki pages | `query`, `locale?`, `path?` | `readOnlyHint: true` |
+| `wikijs_get_page` | Retrieve full page content and metadata | `id?` Page ID, `path?` Page path, `locale="en"` Page locale | `readOnlyHint: true` |
+| `wikijs_list_pages` | List pages with pagination and filtering | `locale?` Filter by locale, `path?` Only include pages under this path, `limit=50` Max pages to return, `offset=0` Skip N pages | `readOnlyHint: true` |
+| `wikijs_get_tree` | Retrieve the hierarchical Wiki.js page tree | `parent_path?` Parent path, `parent_id?` Parent tree node ID, `mode="ALL"` ALL/FOLDERS/PAGES, `locale="en"` Page locale, `includeAncestors=false` Include ancestor nodes | `readOnlyHint: true` |
+| `wikijs_search_pages` | Full-text search across wiki pages | `query` Search query, `locale?` Filter results by locale, `path?` Only include pages under this path | `readOnlyHint: true` |
 
 ## Development
 
